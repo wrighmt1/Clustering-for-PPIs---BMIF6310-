@@ -1,0 +1,36 @@
+#Required Packages
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(dendextend)
+
+#Import Data - (csv file containing  3 columns: Gene Name, Fold Change, Count)
+Input <- read.csv(file="filename", header=T, sep=",")
+
+#Extract Gene Names to get Row Names
+Gene_Names <- Input[,-2:-3]
+
+#Extract raw data used for clustering 
+FC_Count <- Input[,-1]
+
+#Assign Gene_Names as row names for the raw data
+row.names(FC_Count) <- Gene_Names
+
+#Scale/Standardize Data 
+scale(FC_Count)
+
+#Calculate distance/dissimilarity values (euclidean distance used for all analysis)
+Distance <- dist(FC_Count, method="euclidean")
+
+#perform agglomeritive hierarchical clustering (linkage method chosen as complete, average, single, or ward.D)
+HC_Complete <- hclust(Distance, method="complete")
+
+#plot dendrogram (cex=size of text in relation to default setting hang=height of labels for the leaves of the dendrogram (-1=all labels paralell)))
+plot(HC_Complete, cex=0.2, hang=-1)
+
+#perform divisive hierarchical clustering
+HC_Divisive <- diana(Distance)
+
+#plot dendrogram 
+pltree(HC_Divisive, cex=0.2, hang=-1)
+
